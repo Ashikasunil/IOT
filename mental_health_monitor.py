@@ -33,7 +33,7 @@ def suggest_relaxation():
     return random.choice(suggestions)
 
 def fetch_thingspeak_data():
-    url = f"https://api.thingspeak.com/channels/{2939269}/feeds.json?api_key={4MNC2JYMQJQLKSSB}&results=1"
+    url = f"https://api.thingspeak.com/channels/{CHANNEL_ID}/feeds.json?api_key={THINGSPEAK_API_KEY}&results=1"
     response = requests.get(url)
     if response.status_code == 200:
         data = response.json()
