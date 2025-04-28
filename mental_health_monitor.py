@@ -1,13 +1,16 @@
+
+
 # Install required libraries
-# (In your terminal or Colab: pip install streamlit requests)
+# (pip install streamlit requests)
 
 import streamlit as st
 import requests
 import random
 import time
+import pandas as pd
 
 # --- Configuration ---
-THINGSPEAK_API_KEY = 'GN5XX1NDXCP0WTE9'  # <-- optional if fetching from ThinkSpeak
+THINGSPEAK_API_KEY = '4MNC2JYMQJQLKSSB'  # <-- Your Read API Key
 CHANNEL_ID = '2939269'
 
 # --- Functions ---
@@ -47,32 +50,55 @@ def fetch_thingspeak_data():
         st.error("Failed to fetch data from ThingSpeak.")
         return generate_sensor_data()
 
-# --- Streamlit App ---
+# --- App Starts Here ---
 
-st.title("💖 Smart Mental Health Monitoring System")
+st.set_page_config(page_title="Smart Mental Health Dashboard", layout="wide")
 
-# Option to choose simulation or ThinkSpeak
+st.title("💖 Smart Mental Health Monitoring Dashboard")
+
+# Option to choose data source
 mode = st.radio("Choose Data Source:", ("Simulated Data", "ThingSpeak Live Data"))
+
+# Initialize a list to store heart rate history
+if 'heart_rate_history' not in st.session_state:
+    st.session_state.heart_rate_history = []
 
 if st.button("Monitor Now"):
 
+    # Get data
     if mode == "Simulated Data":
         heart_rate, temperature, gsr, activity = generate_sensor_data()
     else:
         heart_rate, temperature, gsr, activity = fetch_thingspeak_data()
 
-    st.subheader("📈 Live Sensor Readings")
-    st.metric("Heart Rate (bpm)", heart_rate)
-    st.metric("Body Temperature (°C)", temperature)
-    st.metric("GSR Value", gsr)
-    st.metric("Activity Level", activity)
+    # Save heart rate history
+    st.session_state.heart_rate_history.append(heart_rate)
 
-    # Stress Detection
-    if detect_stress(heart_rate, gsr):
-        st.error("⚠️ Stress Detected!")
-        st.success(f"💬 Relaxation Suggestion: {suggest_relaxation()}")
-    else:
-        st.success("😊 You are Relaxed!")
+    # --- Layout: 3 Columns ---
+    col1, col2, col3 = st.columns(3)
 
-    st.caption("🔄 Click 'Monitor Now' again to refresh.")
+    with col1:
+        st.metric("❤️ Heart Rate (bpm)", heart_rate)
+        st.metric("🌡️ Temperature (°C)", temperature)
+
+    with col2:
+        st.metric("🧠 GSR Value", gsr)
+        st.metric("🏃‍♂️ Activity Level", activity)
+
+    with col3:
+        if detect_stress(heart_rate, gsr):
+            st.error("⚠️ Stress Detected!")
+            st.success(f"💬 {suggest_relaxation()}")
+        else:
+            st.success("😊 You are Relaxed!")
+
+    st.markdown("---")
+
+    # --- Heart Rate Chart ---
+    st.subheader("📈 Heart Rate Over Time")
+    hr_df = pd.DataFrame({'Heart Rate': st.session_state.heart_rate_history})
+    st.line_chart(hr_df)
+
+    st.caption("🔄 Click 'Monitor Now' every few seconds to update live data.")
+
 
