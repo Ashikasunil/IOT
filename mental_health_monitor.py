@@ -7,8 +7,8 @@ import random
 import time
 
 # --- Configuration ---
-THINGSPEAK_API_KEY = 'YOUR_READ_API_KEY'  # <-- optional if fetching from ThinkSpeak
-CHANNEL_ID = 'YOUR_CHANNEL_ID'
+THINGSPEAK_API_KEY = 'GN5XX1NDXCP0WTE9'  # <-- optional if fetching from ThinkSpeak
+CHANNEL_ID = '2939269'
 
 # --- Functions ---
 
@@ -33,7 +33,7 @@ def suggest_relaxation():
     return random.choice(suggestions)
 
 def fetch_thingspeak_data():
-    url = f"https://api.thingspeak.com/channels/{CHANNEL_ID}/feeds.json?api_key={THINGSPEAK_API_KEY}&results=1"
+    url = f"https://api.thingspeak.com/channels/{2939269}/feeds.json?api_key={4MNC2JYMQJQLKSSB}&results=1"
     response = requests.get(url)
     if response.status_code == 200:
         data = response.json()
